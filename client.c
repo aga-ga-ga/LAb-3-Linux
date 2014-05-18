@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+//Константы и функции, необходимые для работы с сокетами в файловом пространстве имен, объявлены в файле <sys/socket.h>.
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <string.h>
@@ -12,15 +13,17 @@
 main (int argc, char *argv[])
 {
 	int len, error;
-	int sockfd;
-	char send_buf[80];
+	int sockfd; 
+	char send_buf[BUFFER_SIZE];
 	struct sockaddr_in addr;
 
 	if (argc != 3) {
 		perror("wrong args");
 		exit(-1);
 	}
-
+	//AF_INET - домен сокета, обозначает тип соединения
+	//SOCK_STREAM - тип сокета, потоковым сокетам, реализующим соединения «точка-точка» с надежной передачей данных
+	//0 - протокол, используемый для передачи данных 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0)
 	{
@@ -30,14 +33,15 @@ main (int argc, char *argv[])
 
 
 	memset(&addr, 0, sizeof(addr));
-	addr.sin_family      = AF_INET;
-	addr.sin_addr.s_addr = inet_addr(argv[1]);
-	addr.sin_port        = htons(SERVER_PORT);
+	
+	addr.sin_family      = AF_INET; //формат адреса (набор протоколов), в нашем случае (для TCP/IP) оно должно иметь значение AF_INET
+	addr.sin_addr.s_addr = inet_addr(argv[1]); //адрес  узла сети
+	addr.sin_port        = htons(SERVER_PORT); //номер порта на узле сети
 
 
-	error = connect(sockfd,
-					(struct sockaddr *)&addr,
-					sizeof(struct sockaddr_in));
+	error = connect(sockfd, // дескриптор сокета, через который программа обращается к серверу с запросом на соединение
+					(struct sockaddr *)&addr, //указывает на структуру данных, содержащую адрес, приписанный сокету программы-сервера
+					sizeof(struct sockaddr_in)); // размер (в байтах) структуры данных, указываемой аргументом addr
 	if (error < 0)
 	{
 		perror("connect");
