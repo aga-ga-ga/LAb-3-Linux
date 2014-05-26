@@ -47,7 +47,7 @@ void *thread_func(void *sock)
 	close(asock);
 }
 
-void main (int argc, char *argv[])
+int main (int argc, char *argv[])
 {
 	int error, on;
 	int listen_sd;
@@ -62,7 +62,7 @@ void main (int argc, char *argv[])
 	listen_sd = socket(AF_INET, SOCK_STREAM, 0);
 	if (listen_sd < 0) {
 		perror("socket() failed");
-		exit(-1);
+		return -1;
 	}
 
 	/*
@@ -85,7 +85,7 @@ void main (int argc, char *argv[])
 	if (error < 0) {
 		perror("setsockopt() failed");
 		close(listen_sd);
-		exit(-1);
+		return -1;
 	}
 
 	memset(&addr, 0, sizeof(addr));
@@ -98,15 +98,15 @@ void main (int argc, char *argv[])
 	if (error < 0) {
 		perror("bind() failed");
 		close(listen_sd);
-		exit(-1);
-   }
+		return -1;
+   	}
 	// listen - переводит сервер в режим ожидания запроса на соединение
 	// QUEUE_SIZE - максимальное число соединений, которые сервер может обрабатывать одновременно
 	error = listen(listen_sd, QUEUE_SIZE);
 	if (error < 0) {
 		perror("listen() failed");
 		close(listen_sd);
-		exit(-1);
+		return -1;
 	}
 
 	printf("The server is ready\n");
@@ -117,7 +117,7 @@ void main (int argc, char *argv[])
 		if (accept_sd < 0) {
 			perror("accept() failed");
 			close(listen_sd);
-			exit(-1);
+			return -1;
 		}
 		// here start new thread
 		pthread_t pthread;
@@ -135,4 +135,5 @@ void main (int argc, char *argv[])
 		}
 	}
 	close(listen_sd);
+	return 0;
 }
