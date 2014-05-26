@@ -10,7 +10,7 @@
 #define SERVER_PORT 12345
 #define BUFFER_SIZE 80
 
-main (int argc, char *argv[])
+int main (int argc, char *argv[])
 {
 	int len, error;
 	int sockfd; 
@@ -19,18 +19,16 @@ main (int argc, char *argv[])
 
 	if (argc != 3) {
 		perror("wrong args");
-		exit(-1);
+		return -1;
 	}
 	//AF_INET - домен сокета, обозначает тип соединения
 	//SOCK_STREAM - тип сокета, потоковым сокетам, реализующим соединения «точка-точка» с надежной передачей данных
 	//0 - протокол, используемый для передачи данных 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	if (sockfd < 0)
-	{
+	if (sockfd < 0)	{
 		perror("socket");
-		exit(-1);
+		return -1;
 	}
-
 
 	memset(&addr, 0, sizeof(addr));
 	
@@ -42,19 +40,17 @@ main (int argc, char *argv[])
 	error = connect(sockfd, // дескриптор сокета, через который программа обращается к серверу с запросом на соединение
 					(struct sockaddr *)&addr, //указывает на структуру данных, содержащую адрес, приписанный сокету программы-сервера
 					sizeof(struct sockaddr_in)); // размер (в байтах) структуры данных, указываемой аргументом addr
-	if (error < 0)
-	{
+	if (error < 0) {
 		perror("connect");
 		close(sockfd);
-		exit(-1);
+		return -1;
 	}
 
 	len = send(sockfd, argv[2], strlen(argv[2]) + 1, 0);
-	if (len != strlen(argv[2]) + 1)
-	{
+	if (len != strlen(argv[2]) + 1)	{
 		perror("send");
 		close(sockfd);
-		exit(-1);
+		return -1;
 	}
 
 	char buffer[BUFFER_SIZE];
@@ -83,4 +79,5 @@ main (int argc, char *argv[])
 
 	fclose(file);
 	close(sockfd);
+	return 0;
 }
